@@ -77,20 +77,26 @@ const handleInputKeypress = (event) => {
 
 
 const allTasksDone = () => {
-  tasks.forEach((task) => {
-    task.done = !task.done;
-  })
+  const status = allCheckbox.checked;
+  tasks.forEach((task) =>{
+    task.done = status;
+  });
   renderTask(tasks);
   renderPagination(tasks);
 };
 
 const deleteChecked = () => {
-  tasks = tasks.filter(task => !task.done);
-  allCheckbox.checked = false;
-  renderTask(tasks);
-  console.log(tasks);
-  console.log("12313123");
-  renderPagination(tasks);
+  if (filteredTask === 'completed') {
+    renderTask([]);
+    renderPagination([]);
+    renderTaskCountCompleted([]);
+  } else {
+    tasks = tasks.filter(task => !task.done);
+    allCheckbox.checked = false;
+    renderTask(tasks);
+    console.log(filteredTask);
+    renderPagination(tasks);
+  }
 }
 
 const changeTask = (event) => {
@@ -107,8 +113,9 @@ const changeTask = (event) => {
     const id = Number(event.target.parentNode.id);  
     const task = tasks.find((i) => i.id === id);
     task.done = !task.done;
-    
-    renderTask(tasks);
+    const activeTasks = filter();
+    renderTask(activeTasks);
+    renderPagination(activeTasks);
   }
   if (event.target.dataset.action === "edit" && event.detail === 2) {
     event.target.hidden = "true";
@@ -143,6 +150,12 @@ const renderTask = (filteredTasks) => {
    renderTaskCountAll(tasks);
    renderTaskCountActive(tasks);
    renderTaskCountCompleted(tasks);
+  //  if(filteredTasks.length === 0 && filteredTask === 'completed') {
+  //   renderTaskCountCompleted(filteredTasks);
+  //  } else {
+  //   renderTaskCountCompleted(tasks);
+  //  }
+   
 };
 
 const filter = () => {
@@ -170,8 +183,12 @@ const renderPagination = (actualTasks) => {
   if (totalPages < currentPage) {
      currentPage = currentPage - 1
      renderPagination(actualTasks);
+  } else if(totalPages > currentPage && currentPage === 0) {
+    currentPage = 1
+    renderPagination(actualTasks);
+    renderTask(actualTasks)
   } 
-  console.log(totalPages, currentPage);
+  
 }
 
 
@@ -217,6 +234,7 @@ const renderTaskCountActive = (tasks) => {
 const renderTaskCountCompleted = (tasks) => {
   let activeArr = tasks.filter((item) => item.done === true)
   completedChecked.innerHTML = `Completed(${activeArr.length})`
+  console.log(activeArr.length);
 }
 
 
